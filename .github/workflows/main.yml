@@ -1,0 +1,26 @@
+name: Build Minecraft Plugin
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build jar
+        run: mvn -q package
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: vweatherstation-mc
+          path: target/*.jar
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/*.jar
